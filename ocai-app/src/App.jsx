@@ -1,35 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from "react";
+import { useGlobalData } from "./contexts/GlobalDataProvider";
+import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import Teacher from "./pages/Teacher";
+import Unauthorized from "./pages/Unauthorized";
+import ApplicationLayout from "./layouts/ApplicationLayout";
+import Users from "./pages/routes/Users";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-function App() {
-  const [count, setCount] = useState(0)
+import RoleBasedRoute from "./utils/RoleBasedRoute";
 
+
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        {/* Public Route */}
+        <Route path="/" element={<Login />} />
 
-export default App
+        {/* Admin Route */}
+        <Route
+          path="/admin"
+          element={
+            <RoleBasedRoute allowedRoles={['Admin']}>
+              <ApplicationLayout>
+                <Admin />
+              </ApplicationLayout>
+            </RoleBasedRoute>
+          }
+        />
+          {/* Nested Routes under /admin */}
+          {/* <Route path="users" element={<Users />} /> */}
+        {/* </Route> */}
+        <Route
+          path="/admin/users"
+          element={
+            <RoleBasedRoute allowedRoles={['Admin']}>
+              <ApplicationLayout>
+                <Users />
+              </ApplicationLayout>
+            </RoleBasedRoute>
+          }
+        />
+
+        {/* Teacher Route */}
+        <Route
+          path="/teacher"
+          element={
+            <RoleBasedRoute allowedRoles={['Teacher']}>
+              <ApplicationLayout>
+                <Teacher />
+              </ApplicationLayout>
+            </RoleBasedRoute>
+          }
+        />
+
+        {/* Unauthorized Route */}
+        <Route path="/unauthorized" element={<Unauthorized />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
+
